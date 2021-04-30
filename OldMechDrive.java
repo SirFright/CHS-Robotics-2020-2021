@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="RealMechDrive", group="Linear Opmode")
-public class MechanumDrive extends LinearOpMode {
+@TeleOp(name="OldMechDrive", group="Linear Opmode")
+public class OldMechDrive extends LinearOpMode {
 
     // Declare OpMode members.
     private DcMotor LF = null;
