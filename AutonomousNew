@@ -1,0 +1,139 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+@Autonomous(name="AutonomousTesting")
+public class WorkingAutonomous extends LinearOpMode {
+    
+    HardwarePushbotMechanum robot   = new HardwarePushbotMechanum();
+    private ElapsedTime     runtime = new ElapsedTime();
+
+    static final double     COUNTS_PER_MOTOR_REV    = 4;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 72.0 ;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 3.1250 ;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+                                                      (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     driveSpeed             = 0.5;
+    static final double     turnSpeed              = 0.5;
+        
+                
+    public void inchToDegree(int inches){
+    int degrees;
+    degrees = (int)((1/0.0175) * inches);
+    
+    }
+    
+    public void resetEncoders(){
+        robot.motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+    
+    @Override
+    public void runOpMode() {
+        //Initalize variables, done in initalize function in hardware map file
+        robot.initalizeHardwareMap(hardwareMap);
+        resetEncoders();
+
+        // YOU PRESS THE PLAY BUTTON ON PHONE
+        waitForStart();
+
+/*
+        Right = positive, negative 
+        Left = negative, postive
+        1 degree = 0.0175 in 
+
+*/
+
+        //Reverse/turning = using negative distance
+        driveStraight(driveSpeed, 6, 1000);  // S1: Forward 47 Inches with 5 Sec timeout
+        sleep(10000);
+        driveStraight(driveSpeed, -6, 1000);  // S1: Forward 47 Inches with 5 Sec timeout
+        sleep(10000);
+        //driveTurnLeft(driveSpeed, 12, 4);  // S2: Turn Right 12 Inches with 4 Sec timeout
+        //sleep(1000);         
+        //driveReverse(driveSpeed, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+        //sleep(1000);
+
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+    }
+    
+    
+    public void driveStraight(double speed, double inches, double timeoutS) {
+        resetEncoders();
+        
+        int newFrontLeftTarget;
+        int newFrontRightTarget;
+        int newBackLeftTarget;
+        int newBackRightTarget;
+        
+        if (opModeIsActive()) {
+            //Calculate new target
+            newFrontLeftTarget = robot.motorFrontLeft.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
+            newFrontRightTarget = robot.motorFrontRight.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
+            newBackLeftTarget = robot.motorBackLeft.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
+            newBackRightTarget = robot.motorBackRight.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
+            
+            //Set new target
+            robot.motorFrontLeft.setTargetPosition(newFrontLeftTarget);
+            robot.motorBackRight.setTargetPosition(newBackRightTarget);
+            robot.motorFrontRight.setTargetPosition(newFrontRightTarget);
+            robot.motorBackLeft.setTargetPosition(newBackLeftTarget);
+            
+            // Turn On RUN_TO_POSITION
+            robot.motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);            
+
+            // Reset the timeout time and start motion.
+            runtime.reset();
+            robot.motorFrontLeft.setPower(Math.abs(speed));
+            robot.motorFrontRight.setPower(Math.abs(speed));
+            robot.motorBackLeft.setPower(Math.abs(speed));
+            robot.motorBackRight.setPower(Math.abs(speed));            
+        }
+    }
+    
+    public void driveTurnLeft(double speed, double inchesNew, double timeoutS) {
+        int newFrontLeftTarget;
+        int newFrontRightTarget;
+        int newBackLeftTarget;
+        int newBackRightTarget;
+        int degreesNew;
+        
+        int degreesNew = inchToDegree(inchesNew);
+        if (opModeIsActive()) {
+            //Calculate new target
+            newFrontLeftTarget = robot.motorFrontLeft.getCurrentPosition() + (int)(-degrees * COUNTS_PER_INCH);
+            newFrontRightTarget = robot.motorFrontRight.getCurrentPosition() + (int)(degrees * COUNTS_PER_INCH);
+            newBackLeftTarget = robot.motorBackLeft.getCurrentPosition() + (int)(-degrees * COUNTS_PER_INCH);
+            newBackRightTarget = robot.motorBackRight.getCurrentPosition() + (int)(degrees * COUNTS_PER_INCH);
+            
+            //Set new target
+            robot.motorFrontLeft.setTargetPosition(newFrontLeftTarget);
+            robot.motorBackRight.setTargetPosition(newBackRightTarget);
+            robot.motorFrontRight.setTargetPosition(newFrontRightTarget);
+            robot.motorBackLeft.setTargetPosition(newBackLeftTarget);
+            
+            // Turn On RUN_TO_POSITION
+            robot.motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);            
+
+            // Reset the timeout time and start motion.
+            runtime.reset();
+            robot.motorFrontLeft.setPower(Math.abs(speed));
+            robot.motorFrontRight.setPower(Math.abs(speed));
+            robot.motorBackLeft.setPower(Math.abs(speed));
+            robot.motorBackRight.setPower(Math.abs(speed));            
+        }
+    }
+}
