@@ -16,15 +16,15 @@ public class WorkingAutonomous extends LinearOpMode {
     static final double     DRIVE_GEAR_REDUCTION    = 72.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 3.1250 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-                                                      (WHEEL_DIAMETER_INCHES * 3.1415);
+                                                      (WHEEL_DIAMETER_INCHES * Math.PI);
     static final double     driveSpeed             = 0.5;
     static final double     turnSpeed              = 0.5;
         
                 
-    public void inchToDegree(int inches){
+    public int inchToDegree(int inches){
     int degrees;
     degrees = (int)((1/0.0175) * inches);
-    
+    return degrees;
     }
     
     public void resetEncoders(){
@@ -51,9 +51,9 @@ public class WorkingAutonomous extends LinearOpMode {
 */
 
         //Reverse/turning = using negative distance
-        driveStraight(driveSpeed, 6, 1000);  // S1: Forward 47 Inches with 5 Sec timeout
+        driveStraight(driveSpeed, 20, 1000);  // S1: Forward 47 Inches with 5 Sec timeout
         sleep(10000);
-        driveStraight(driveSpeed, -6, 1000);  // S1: Forward 47 Inches with 5 Sec timeout
+        driveStraight(driveSpeed, -10, 1000);  // S1: Forward 47 Inches with 5 Sec timeout
         sleep(10000);
         //driveTurnLeft(driveSpeed, 12, 4);  // S2: Turn Right 12 Inches with 4 Sec timeout
         //sleep(1000);         
@@ -101,20 +101,20 @@ public class WorkingAutonomous extends LinearOpMode {
         }
     }
     
-    public void driveTurnLeft(double speed, double inchesNew, double timeoutS) {
+    public void driveTurnLeft(double speed, int inchesNew, double timeoutS) {
         int newFrontLeftTarget;
         int newFrontRightTarget;
         int newBackLeftTarget;
         int newBackRightTarget;
-        int degreesNew;
         
         int degreesNew = inchToDegree(inchesNew);
-        if (opModeIsActive()) {
+        
+        
             //Calculate new target
-            newFrontLeftTarget = robot.motorFrontLeft.getCurrentPosition() + (int)(-degrees * COUNTS_PER_INCH);
-            newFrontRightTarget = robot.motorFrontRight.getCurrentPosition() + (int)(degrees * COUNTS_PER_INCH);
-            newBackLeftTarget = robot.motorBackLeft.getCurrentPosition() + (int)(-degrees * COUNTS_PER_INCH);
-            newBackRightTarget = robot.motorBackRight.getCurrentPosition() + (int)(degrees * COUNTS_PER_INCH);
+            newFrontLeftTarget = robot.motorFrontLeft.getCurrentPosition() + (int)(-degreesNew * COUNTS_PER_INCH);
+            newFrontRightTarget = robot.motorFrontRight.getCurrentPosition() + (int)(degreesNew * COUNTS_PER_INCH);
+            newBackLeftTarget = robot.motorBackLeft.getCurrentPosition() + (int)(-degreesNew * COUNTS_PER_INCH);
+            newBackRightTarget = robot.motorBackRight.getCurrentPosition() + (int)(degreesNew * COUNTS_PER_INCH);
             
             //Set new target
             robot.motorFrontLeft.setTargetPosition(newFrontLeftTarget);
@@ -134,6 +134,6 @@ public class WorkingAutonomous extends LinearOpMode {
             robot.motorFrontRight.setPower(Math.abs(speed));
             robot.motorBackLeft.setPower(Math.abs(speed));
             robot.motorBackRight.setPower(Math.abs(speed));            
-        }
+        
     }
 }
